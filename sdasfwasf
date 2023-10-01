@@ -1,0 +1,137 @@
+local ScreenGui = Instance.new("ScreenGui")
+local Top = Instance.new("Frame")
+local Bottom = Instance.new("Frame")
+local CashCounter = Instance.new("TextLabel")
+local ImageLabel = Instance.new("ImageLabel")
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Top.Name = "Top"
+Top.Parent = ScreenGui
+Top.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+Top.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Top.BorderSizePixel = 0
+Top.Position = UDim2.new(0.131787032, 0, 0.598984778, 0)
+Top.Size = UDim2.new(0, 266, 0, 54)
+
+Bottom.Name = "Bottom"
+Bottom.Parent = Top
+Bottom.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Bottom.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Bottom.BorderSizePixel = 0
+Bottom.Position = UDim2.new(0, 0, 0.987889051, 0)
+Bottom.Size = UDim2.new(0, 266, 0, 55)
+
+CashCounter.Name = "CashCounter"
+CashCounter.Parent = Bottom
+CashCounter.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+CashCounter.BackgroundTransparency = 1.000
+CashCounter.BorderColor3 = Color3.fromRGB(0, 0, 0)
+CashCounter.BorderSizePixel = 0
+CashCounter.Position = UDim2.new(0, 0, 0.181818187, 0)
+CashCounter.Size = UDim2.new(0, 266, 0, 35)
+CashCounter.Font = Enum.Font.Gotham
+CashCounter.Text = "nil $"
+CashCounter.TextColor3 = Color3.fromRGB(255, 255, 255)
+CashCounter.TextSize = 14.000
+
+ImageLabel.Parent = Top
+ImageLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel.BackgroundTransparency = 1.000
+ImageLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+ImageLabel.BorderSizePixel = 0
+ImageLabel.Position = UDim2.new(0.381044894, 0, 0.00740785943, 0)
+ImageLabel.Size = UDim2.new(0, 62, 0, 53)
+ImageLabel.Image = "rbxassetid://14918483523"
+
+-- Scripts:
+
+local function DICFI_fake_script() -- CashCounter.LocalScript 
+	local script = Instance.new('LocalScript', CashCounter)
+
+	local function AddComa(p1)
+		p1 = tostring(p1)
+		return (((p1:reverse()):gsub("%d%d%d", "%1,")):reverse()):gsub("^,", "")
+	end
+	
+	local TextLabel = script.Parent
+	
+	local Drops = game.Workspace.Ignored.Drop
+	
+	local TotalAmount = 0
+	
+	for i,v in next, Drops:GetChildren() do
+		if v.Name == "MoneyDrop" then
+			local Money = string.gsub(v.BillboardGui.TextLabel.Text, "%D", "")
+	
+			TotalAmount = TotalAmount + Money
+		end
+	end
+	
+	Drops.ChildAdded:Connect(function (Child)
+		if Child.Name == "MoneyDrop" then
+			local Object = Child:WaitForChild("BillboardGui"):WaitForChild("TextLabel")
+			local Money = string.gsub(Object.Text, "%D", "")
+	
+			TotalAmount = TotalAmount + Money
+		end
+	end)
+	
+	Drops.ChildRemoved:Connect(function (Child)
+		if Child.Name == "MoneyDrop" then
+			local Money = string.gsub(Child.BillboardGui.TextLabel.Text, "%D", "")
+	
+			TotalAmount = TotalAmount - Money
+		end
+	end)
+	
+	game:GetService("RunService").Heartbeat:Connect(function ()
+		TextLabel.Text = AddComa(tostring(TotalAmount)) .. " $"
+	end)
+end
+coroutine.wrap(DICFI_fake_script)()
+local function ERVJYMP_fake_script() -- Top.DragScript 
+	local script = Instance.new('LocalScript', Top)
+
+	--Not made by me, check out this video: https://www.youtube.com/watch?v=z25nyNBG7Js&t=22s
+	--Put this inside of your Frame and configure the speed if you would like.
+	--Enjoy! Credits go to: https://www.youtube.com/watch?v=z25nyNBG7Js&t=22s
+	
+	local UIS = game:GetService('UserInputService')
+	local frame = script.Parent
+	local dragToggle = nil
+	local dragSpeed = 0.25
+	local dragStart = nil
+	local startPos = nil
+	
+	local function updateInput(input)
+		local delta = input.Position - dragStart
+		local position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		game:GetService('TweenService'):Create(frame, TweenInfo.new(dragSpeed), {Position = position}):Play()
+	end
+	
+	frame.InputBegan:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then 
+			dragToggle = true
+			dragStart = input.Position
+			startPos = frame.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragToggle = false
+				end
+			end)
+		end
+	end)
+	
+	UIS.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			if dragToggle then
+				updateInput(input)
+			end
+		end
+	end)
+	
+end
+coroutine.wrap(ERVJYMP_fake_script)()
